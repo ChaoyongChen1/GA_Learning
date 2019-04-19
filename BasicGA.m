@@ -1,6 +1,6 @@
 function BasicGA
 tic
-%% ��ʼ����ȷ��
+%% 初始参数确定
 DNA_SIZE=10;
 POP_SIZE=100;
 CROSS_RATE=0.8;
@@ -8,19 +8,19 @@ MUTATION_RATE=0.003;
 N_GENERATIONS=300;
 X_BOUND=[0,5];
 
-%% ��ѭ��
-%������ɢ���ȷֲ���pop����
+%% 主循环
+%产生离散均匀分布的pop矩阵
 pop=rand(POP_SIZE,DNA_SIZE)<0.5;
 x=X_BOUND(1):(X_BOUND(2)-X_BOUND(1))/200:X_BOUND(2);
 
 for i=1:N_GENERATIONS
     F_values=F(translateDNA(pop));
-    %��ͼ
+    %画图
     clf;
     plot(x,F(x));
     hold on;
     scatter(translateDNA(pop), F_values, 'red', 'filled'); 
-    title(sprintf('�� %d �ε������ʾ��ͼ', i));
+    title(sprintf('第 %d 次迭代结果示意图', i));
     pause(0.05);
     
     fitness=get_fitness(F_values);
@@ -35,20 +35,20 @@ for i=1:N_GENERATIONS
     pop=popNew;
 end
 
-%% F() ���غ���ֵ
+%% F() 返回函数值
     function y=F(x)
        y=sin(10*x).*x+cos(2*x).*x;
     end
-%% get_fitness() ����һ���Ǹ�������Ӧ��ֵ
+%% get_fitness() 返回一个非负的适应度值
     function y=get_fitness(F_values)
         y=F_values+1e-3-min(F_values);
     end
-%% translateDNS() ����DNA,�������Ʊ���Ϊʮ������
+%% translateDNS() 编码DNA,将二进制编码为十进制数
     function trans=translateDNA(pop)
         trans1=(pop*pow2(DNA_SIZE-1:-1:0).')';
         trans=trans1/(2^DNA_SIZE-1)*X_BOUND(2);
     end
-%% select() ѡ����Ӧ�ȸߵ�DNA���У������µ���Ⱥ
+%% select() 轮盘赌法选择适应度高的DNA序列，生成新的种群
     function pop_new=select(pop,fitness)
         p=fitness/sum(fitness);
         p_add=p(1);
@@ -60,7 +60,7 @@ end
             pop_new(j,:)=pop(select(1),:);
         end  
      end
-%% crossover() ���游ĸ����
+%% crossover() 交叉父母基因
     function parent=crossover(parent,pop)
         if rand<CROSS_RATE
             i_NUM=unidrnd(POP_SIZE);
@@ -71,7 +71,7 @@ end
         end
     end
  
-%% mutation() �������
+%% mutation() 变异基因
     function child=mutate(child)
         for point=1:DNA_SIZE
             if rand<MUTATION_RATE
